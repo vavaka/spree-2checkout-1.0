@@ -1,0 +1,14 @@
+PATH
+  remote: .
+  specs:
+    spree_two_checkout (0.1.1)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  spree_two_checkout!
