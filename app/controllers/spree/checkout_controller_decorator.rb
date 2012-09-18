@@ -3,9 +3,10 @@ module Spree
     skip_before_filter :verify_authenticity_token
     before_filter :two_checkout_hook, :only => [:update]
 
+    helper_method :payment_method
+
     def two_checkout_payment
-       payment_method =  PaymentMethod.find(params[:payment_method_id])
-       load_order
+      load_order
     end
 
     def two_checkout_success
@@ -35,16 +36,18 @@ module Spree
     end
 
     def two_checkout_validate
-      pm=@order.payment_method
-      if pm.preferred(:test_mode) == true
+      if payment_method.preferred(:test_mode)
         order_number = 1
       else
         order_number = params['order_number']
       end
-      if Digest::MD5.hexdigest("#{pm.preferred(:secret_word)}#{pm.preferred(:sid)}#{order_number}#{'%.2f' % @order.total}").upcase != params['key']
+      if Digest::MD5.hexdigest("#{payment_method.preferred(:secret_word)}#{payment_method.preferred(:sid)}#{order_number}#{'%.2f' % @order.total}").upcase != params['key']
        abort("MD5 Hash did not match. If you are testing with demo sales please select test mode in your payment configuration.")
       end
     end
 
+    def payment_method
+      @payment_method ||= PaymentMethod.find(params[:payment_method_id])
+    end
   end
 end
